@@ -130,7 +130,7 @@
                     
                         <div class="tags-container-vertical">
                             <div class="tags-sub-container">
-                                <a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/bXSS/">#bXSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a>
+                                <a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a> <a class="fw3 ph1 dib" href="/tags/bXSS/">#bXSS</a>
                             </div>
                         </div>
                     
@@ -139,7 +139,7 @@
                     <!-- So you thought you were safe ALT... Think again -->
 <p>When auditing applications, sometimes context is lost, and issues are missed. The same will be true when looking for <a href="https://ardern.io/2017/12/10/blind-xss/">Blind Cross-Site-Scripting (bXSS)</a>. Last year I blogged about <a href="https://ardern.io/2018/12/07/angularjs-bxss/">AngularJS bXSS</a> and how you can leverage AngularJS to execute JavaScript for you in a bXSS context. </p>
 <p>In this post I want to increase the payload definition for various ways to detect bXSS, hopefully helping identify undiscovered bXSS in back-end systems. I wanted to do this in an automated way, so by creating  different context blind XSS payloads, which can be used either in Burp or other automated scanning tools for services such as <a href="https://xsshunter.com" target="_blank" rel="noopener">xsshunter</a> or <a href="https://github.com/LewisArdern/bXSS" target="_blank" rel="noopener">bXSS (which all of these are included by default).</a></p>
-<h2 id="Verifying-bXSS"><a href="#Verifying-bXSS" class="headerlink" title="Verifying bXSS"></a>Verifying bXSS</h2><p><b>Images</b><br>The simplest way to confirm bXSS most of the time is to include an image to render and capture the referer (if this is good enough for you, then you can ignore the rest of the blog). It is very rare to see a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/img-src" target="_blank" rel="noopener">Content-Security-Policy with img-src</a>, but it does happen and it has been seen in the wild, which blocks arbitrary domains.</p>
+<h2 id="Verifying-bXSS"><a href="#Verifying-bXSS" class="headerlink" title="Verifying bXSS"></a>Verifying bXSS</h2><p><b>Images</b><br>The simplest way to confirm bXSS most of the time is to include an image to render and capture the referer (if this is good enough for you, then you can ignore the rest of the blog). Sometimes websites deploy a strict <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/img-src" target="_blank" rel="noopener">Content-Security-Policy (CSP) with img-src</a>, which blocks loading images from arbitrary domains.</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Image for HTTP Interaction --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">'//domain/xss'</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>You may want to take into account frameworks like Angular and AngularJS which sanitizes untrusted data, but will retain <a href="https://stackblitz.com/edit/angular-inner-html-lrmddo" target="_blank" rel="noopener">images</a> as they are technically valid HTML and will remove event handlers (which makes sense) but then this would likely be HTML Injection, and if an application is using img-src, this would not work as it is unlikely that the domain we control is in the approved whitelist.</p>
 <img src="/2019/06/20/payload-bxss/Images.jpg" title="image from stackblitz">
@@ -193,7 +193,7 @@
                     <!-- Tags Bottom -->
                     
                         <div class="tags-container-bottom">
-                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/bXSS/">#bXSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a>
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a> <a class="fw3 ph1 dib" href="/tags/bXSS/">#bXSS</a>
                         </div>
                     
 
